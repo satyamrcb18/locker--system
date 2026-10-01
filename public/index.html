@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#090d16">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Smart Locker">
+  <title>Smart Locker System - NextGen Storage</title>
+
+  <!-- PWA Web App Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="logo-group">
+        <div class="logo-icon">🔐</div>
+        <div class="title-area">
+          <h1>Smart Locker System</h1>
+          <p>Secure Storage & PIN-Protected Vault Management</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+          <span id="themeToggleIcon">☀️</span> <span id="themeToggleText">Light Mode</span>
+        </button>
+        <button class="btn btn-primary" id="btnDepositAny">
+          <span>➕</span> Quick Deposit
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-bar">
+      <div class="stat-card">
+        <div class="stat-icon total">📦</div>
+        <div class="stat-info">
+          <h3>Total Lockers</h3>
+          <div class="val" id="statTotal">15</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon available">🟢</div>
+        <div class="stat-info">
+          <h3>Available</h3>
+          <div class="val" id="statAvailable">15</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon occupied">🔒</div>
+        <div class="stat-info">
+          <h3>Occupied</h3>
+          <div class="val" id="statOccupied">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon approaching">⏳</div>
+        <div class="stat-info">
+          <h3>Due Soon (20h+)</h3>
+          <div class="val" id="statApproaching">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon overdue">⚠️</div>
+        <div class="stat-info">
+          <h3>Overdue (>24h)</h3>
+          <div class="val" id="statOverdue">0</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon maintenance">🛠️</div>
+        <div class="stat-info">
+          <h3>Maintenance</h3>
+          <div class="val" id="statMaintenance">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="controls-bar">
+      <div class="filter-tabs">
+        <button class="tab-btn active" data-filter="ALL">All Lockers</button>
+        <button class="tab-btn" data-filter="SMALL">Small (1-5)</button>
+        <button class="tab-btn" data-filter="MEDIUM">Medium (6-10)</button>
+        <button class="tab-btn" data-filter="LARGE">Large (11-15)</button>
+        <button class="tab-btn" data-filter="APPROACHING">⏳ Due Soon</button>
+        <button class="tab-btn" data-filter="OVERDUE">⚠️ Overdue</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="lockerSearchInput" class="search-input"
+          placeholder="🔍 Search locker # or depositor name...">
+      </div>
+
+      <div class="legend">
+        <div class="legend-item"><span class="dot available"></span> Available</div>
+        <div class="legend-item"><span class="dot occupied"></span> Occupied</div>
+        <div class="legend-item"><span class="dot approaching"></span> Due Soon (20h+)</div>
+        <div class="legend-item"><span class="dot overdue"></span> Overdue (>24h)</div>
+        <div class="legend-item"><span class="dot maintenance"></span> Maintenance</div>
+      </div>
+    </div>
+
+    <!-- Locker Grid -->
+    <div class="locker-grid" id="lockerGrid">
+      <!-- Dynamic Locker Cards rendered via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Deposit Modal -->
+  <div class="modal-overlay" id="modalDeposit">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>📥 Deposit Item</h2>
+        <button class="close-btn" data-close="modalDeposit">&times;</button>
+      </div>
+      <form id="formDeposit">
+        <div class="form-group">
+          <label>Select Locker</label>
+          <select id="depositLockerSelect" class="form-control">
+            <!-- Available lockers options -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Depositor Name</label>
+          <input type="text" id="depositName" class="form-control" placeholder="e.g. Satyam Singh" required>
+        </div>
+
+        <div class="form-group">
+          <label>Item Description</label>
+          <input type="text" id="depositItem" class="form-control" placeholder="e.g. Laptop & Gold Watch" required>
+        </div>
+
+        <div class="form-group">
+          <label>Set 4-Digit Security PIN (Mandatory Baseline)</label>
+          <div class="pin-display" id="depositPinDisplay">••••</div>
+          <div class="keypad" id="depositKeypad">
+            <button type="button" class="key-btn" data-val="1">1</button>
+            <button type="button" class="key-btn" data-val="2">2</button>
+            <button type="button" class="key-btn" data-val="3">3</button>
+            <button type="button" class="key-btn" data-val="4">4</button>
+            <button type="button" class="key-btn" data-val="5">5</button>
+            <button type="button" class="key-btn" data-val="6">6</button>
+            <button type="button" class="key-btn" data-val="7">7</button>
+            <button type="button" class="key-btn" data-val="8">8</button>
+            <button type="button" class="key-btn" data-val="9">9</button>
+            <button type="button" class="key-btn action-clear" data-action="clear">C</button>
+            <button type="button" class="key-btn" data-val="0">0</button>
+            <button type="button" class="key-btn action-back" data-action="back">⌫</button>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+          Confirm & Lock Item
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Retrieve Modal -->
+  <div class="modal-overlay" id="modalRetrieve">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>🔓 Retrieve Item</h2>
+        <button class="close-btn" data-close="modalRetrieve">&times;</button>
+      </div>
+      <div id="retrieveLockerInfo" style="margin-bottom: 0.75rem; font-size: 0.9rem; color: var(--text-muted);">
+        Authenticate to unlock <strong id="retrieveLockerTitle" style="color: var(--cyan);">Locker #--</strong>
+      </div>
+      <div id="retrieveLockNotice"
+        style="display:none; margin-bottom: 1rem; font-size: 0.85rem; color: var(--rose); background: rgba(239,68,68,0.1); border: 1px solid var(--rose); border-radius: var(--radius-md); padding: 0.6rem 0.85rem;">
+      </div>
+
+      <!-- PIN Auth View -->
+      <div id="retrievePinView" class="auth-view active">
+        <div class="form-group">
+          <label>Enter 4-Digit Security PIN</label>
+          <div class="pin-display" id="retrievePinDisplay">••••</div>
+          <div class="keypad" id="retrieveKeypad">
+            <button type="button" class="key-btn" data-val="1">1</button>
+            <button type="button" class="key-btn" data-val="2">2</button>
+            <button type="button" class="key-btn" data-val="3">3</button>
+            <button type="button" class="key-btn" data-val="4">4</button>
+            <button type="button" class="key-btn" data-val="5">5</button>
+            <button type="button" class="key-btn" data-val="6">6</button>
+            <button type="button" class="key-btn" data-val="7">7</button>
+            <button type="button" class="key-btn" data-val="8">8</button>
+            <button type="button" class="key-btn" data-val="9">9</button>
+            <button type="button" class="key-btn action-clear" data-action="clear">C</button>
+            <button type="button" class="key-btn" data-val="0">0</button>
+            <button type="button" class="key-btn action-back" data-action="back">⌫</button>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary" id="btnSubmitRetrieve"
+          style="width: 100%; justify-content: center; margin-top: 1rem;">
+          Unlock Locker
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Ticket Modal with QR Code -->
+  <div class="modal-overlay" id="modalTicket">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>🎟️ Storage Receipt</h2>
+        <button class="close-btn" data-close="modalTicket">&times;</button>
+      </div>
+      <div class="ticket-container" id="ticketContent">
+        <!-- Rendered ticket info & QR code -->
+      </div>
+      <div class="ticket-actions" style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+        <button class="btn btn-primary" onclick="window.print()" style="flex: 1; justify-content: center;">
+          🖨️ Print Receipt
+        </button>
+        <button class="btn btn-secondary" data-close="modalTicket" style="flex: 1; justify-content: center;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Scan-to-Retrieve Modal -->
+  <div class="modal-overlay" id="modalQrScan">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>📷 Scan to Retrieve</h2>
+        <button class="close-btn" data-close="modalQrScan">&times;</button>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+        Point your camera at the QR code on your deposit receipt.
+      </p>
+      <div id="qrReaderView"
+        style="width: 100%; border-radius: var(--radius-md); overflow: hidden; min-height: 220px; background: rgba(0,0,0,0.3);">
+      </div>
+      <div class="form-group" style="margin-top: 1.25rem;">
+        <label>Camera not working? Enter Locker ID manually</label>
+        <div style="display: flex; gap: 0.5rem;">
+          <input type="number" id="manualLockerIdInput" class="form-control" min="1" max="15" placeholder="e.g. 9">
+          <button class="btn btn-primary" id="btnManualLockerGo" style="white-space: nowrap;">Go</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- QRCode.js Library (generates the QR code on the receipt) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- html5-qrcode Library (scans QR codes using the device camera) -->
+  <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <!-- Main Application Logic -->
+  <script src="app.js"></script>
+</body>
+
+</html>

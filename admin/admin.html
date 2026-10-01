@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#090d16">
+  <title>Smart Locker - Master Admin Portal</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="../index.css">
+  <style>
+    .admin-login-box {
+      max-width: 400px;
+      margin: 4rem auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border-glass-glow);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      backdrop-filter: blur(16px);
+      text-align: center;
+    }
+    .admin-dashboard {
+      display: none;
+      width: 100%;
+      max-width: 1280px;
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-glass);
+    }
+    .status-badge {
+      padding: 0.25rem 0.6rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .status-badge.AVAILABLE { background: rgba(16, 185, 129, 0.2); color: var(--emerald); }
+    .status-badge.OCCUPIED { background: rgba(245, 158, 11, 0.2); color: var(--amber); }
+    .status-badge.MAINTENANCE { background: rgba(239, 68, 68, 0.2); color: var(--rose); }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <!-- Admin Login Screen -->
+    <div id="adminLoginScreen" class="admin-login-box">
+      <div class="logo-icon" style="margin: 0 auto 1rem auto; width: 56px; height: 56px; font-size: 1.8rem;">⚡</div>
+      <h2 style="margin-bottom: 0.5rem;">Master Admin Portal</h2>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">
+        Enter Master Admin PIN to access system controls
+      </p>
+
+      <div class="pin-display" id="adminLoginPinDisplay">••••</div>
+      <div class="keypad" id="adminLoginKeypad" style="max-width: 280px; margin: 0 auto 1.5rem auto;">
+        <button type="button" class="key-btn" data-val="1">1</button>
+        <button type="button" class="key-btn" data-val="2">2</button>
+        <button type="button" class="key-btn" data-val="3">3</button>
+        <button type="button" class="key-btn" data-val="4">4</button>
+        <button type="button" class="key-btn" data-val="5">5</button>
+        <button type="button" class="key-btn" data-val="6">6</button>
+        <button type="button" class="key-btn" data-val="7">7</button>
+        <button type="button" class="key-btn" data-val="8">8</button>
+        <button type="button" class="key-btn" data-val="9">9</button>
+        <button type="button" class="key-btn action-clear" data-action="clear">C</button>
+        <button type="button" class="key-btn" data-val="0">0</button>
+        <button type="button" class="key-btn action-back" data-action="back">⌫</button>
+      </div>
+
+      <button type="button" class="btn btn-primary" id="btnAdminLoginSubmit" style="width: 100%; justify-content: center;">
+        Login as Master Admin
+      </button>
+
+      <a href="/" style="display: inline-block; margin-top: 1.25rem; color: var(--text-muted); font-size: 0.85rem; text-decoration: none;">
+        ← Return to Main Locker Kiosk
+      </a>
+    </div>
+
+    <!-- Admin Main Dashboard -->
+    <div id="adminDashboardScreen" class="admin-dashboard">
+      <div class="admin-header">
+        <div>
+          <h1 style="font-size: 1.75rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+            <span>⚡ Vault Control Panel</span>
+            <span style="font-size: 0.75rem; padding: 0.25rem 0.6rem; background: rgba(6,182,212,0.18); color: var(--cyan); border: 1px solid var(--cyan); border-radius: 12px;">Super Admin</span>
+          </h1>
+          <p style="color: var(--text-muted); font-size: 0.88rem;">Real-time management, force unlock, and audit logs</p>
+        </div>
+
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <button class="btn btn-secondary" id="btnOpenChangePin">🔐 Change Admin PIN</button>
+          <button class="btn btn-primary" id="btnAdminLogout" style="background: linear-gradient(135deg, var(--rose), #dc2626);">🚪 Logout</button>
+        </div>
+      </div>
+
+      <!-- System Stats Cards -->
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-icon total">📦</div>
+          <div class="stat-info">
+            <h3>Total Lockers</h3>
+            <div class="val" id="statAdminTotal">15</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon available">🟢</div>
+          <div class="stat-info">
+            <h3>Available</h3>
+            <div class="val" id="statAdminAvailable">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon occupied">🔒</div>
+          <div class="stat-info">
+            <h3>Occupied</h3>
+            <div class="val" id="statAdminOccupied">0</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon maintenance">🛠️</div>
+          <div class="stat-info">
+            <h3>Maintenance</h3>
+            <div class="val" id="statAdminMaintenance">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lockers Control Table -->
+      <div style="margin-bottom: 2rem;">
+        <h2 style="font-size: 1.2rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+          <span>📦 Locker Operations & Emergency Controls</span>
+          <button class="btn btn-secondary" id="btnRefreshLockers" style="font-size: 0.8rem; padding: 0.35rem 0.75rem;">🔄 Refresh Table</button>
+        </h2>
+
+        <div class="log-table-wrapper" style="max-height: 400px;">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>Locker #</th>
+                <th>Size</th>
+                <th>Status</th>
+                <th>Depositor</th>
+                <th>Item Description</th>
+                <th>Deposit Time</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="adminLockerRows">
+              <!-- Rendered by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Audit Logs Table -->
+      <div>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
+          <h2 style="font-size: 1.2rem; margin: 0;">📜 Real-Time Audit Log Stream</h2>
+
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <input type="text" id="adminAuditSearch" class="search-input" placeholder="🔍 Search logs..." style="width: 200px;">
+            <button class="btn btn-primary" id="btnExportAuditCSV">📥 Export CSV</button>
+          </div>
+        </div>
+
+        <div class="log-table-wrapper" style="max-height: 350px;">
+          <table class="log-table">
+            <thead>
+              <tr>
+                <th>Log ID</th>
+                <th>Timestamp</th>
+                <th>Locker ID</th>
+                <th>Action</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="adminAuditRows">
+              <!-- Rendered by admin.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Change PIN Modal -->
+  <div class="modal-overlay" id="modalChangeAdminPin">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>🔐 Change Master Admin PIN</h2>
+        <button class="close-btn" data-close="modalChangeAdminPin">&times;</button>
+      </div>
+
+      <form id="formChangeAdminPin">
+        <div class="form-group">
+          <label>Current Master PIN</label>
+          <input type="password" id="inputCurrentAdminPin" class="form-control" maxlength="4" required placeholder="Current 4-digit PIN">
+        </div>
+        <div class="form-group">
+          <label>New Master PIN (4 digits)</label>
+          <input type="password" id="inputNewAdminPin" class="form-control" maxlength="4" required placeholder="New 4-digit PIN">
+        </div>
+        <div class="form-group">
+          <label>Confirm New Master PIN</label>
+          <input type="password" id="inputConfirmAdminPin" class="form-control" maxlength="4" required placeholder="Confirm 4-digit PIN">
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+          Update Master PIN
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container" id="adminToastContainer"></div>
+
+  <script src="admin.js"></script>
+</body>
+
+</html>
